@@ -9,7 +9,7 @@ class Scene1 extends Scene {
 	}
 
 	create() {
-		this.brick = new Cube(2, new Color('rgb(255,0,0)'));
+		this.brick = new Cube(200, new Color('rgb(255,0,0)'));
 		this.add(this.brick);
 
 		const ambientLight = new HemisphereLight(0xffffbb, 0x080820, .5);
