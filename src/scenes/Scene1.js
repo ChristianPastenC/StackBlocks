@@ -1,5 +1,5 @@
 import { Scene, Color, DirectionalLight, HemisphereLight } from 'three';
-import { Cube } from '../objects/Cube';
+import BoxCreator from '../objects/BoxCreator';
 
 class Scene1 extends Scene {
 	constructor() {
@@ -9,9 +9,15 @@ class Scene1 extends Scene {
 	}
 
 	create() {
-		this.brick = new Cube(200, new Color('rgb(255,0,0)'));
-		this.add(this.brick);
-
+		this.baseCube = new BoxCreator({
+			width: 200,
+			height: 200,
+			alt: 200,
+			color: 0x2c3e50,
+		});
+		this.add(this.baseCube);
+		
+		// Lights
 		const ambientLight = new HemisphereLight(0xffffbb, 0x080820, .5);
 		const light = new DirectionalLight(0xffffff, 1.0);
 		this.add(light, ambientLight);
