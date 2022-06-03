@@ -4,9 +4,11 @@ import BoxCreator from '../objects/BoxCreator';
 import SlicesBox from '../objects/SlicesBox';
 import Observer, { EVENTS } from '../Observer';
 import * as TWEEN from '@tweenjs/tween.js/dist/tween.umd';
+import UserInterface from '../objects/UserInterface';
 class Scene1 extends Scene {
 	constructor() {
 		super();
+		const userInterface = new UserInterface();
 		this.background = new Color('skyblue').convertSRGBToLinear();
 
 		this.stack_points = 0;
@@ -60,6 +62,7 @@ class Scene1 extends Scene {
 
 		Observer.on(EVENTS.STACK, (new_box) => {
 			this.stack_points++;
+			Observer.emit(EVENTS.UPDATE_POINTS, this.stack_points);
 
 			// Removemos el bloque principal
 			this.boxes_group.remove(this.getLastBox());
