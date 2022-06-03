@@ -1,11 +1,13 @@
 import { Scene, Color, DirectionalLight, HemisphereLight, Group, AxesHelper } from 'three';
 import Box from '../objects/Box';
 import BoxCreator from '../objects/BoxCreator';
+import Observer, { EVENTS } from '../Observer';
 class Scene1 extends Scene {
 	constructor() {
 		super();
 		this.background = new Color('skyblue').convertSRGBToLinear();
 		this.create();
+		this.events();
 	}
 
 	create() {
@@ -27,11 +29,6 @@ class Scene1 extends Scene {
 			last: this.baseCube
 		});
 
-		// Events
-		window.addEventListener('click', () => {
-			this.click();
-		});
-
 		// Helpers
 		this.add(new AxesHelper(800));
 
@@ -45,11 +42,21 @@ class Scene1 extends Scene {
 		return this.boxesGroup.children[this.boxesGroup.children.length - 1];
 	}
 
-	click() {
-		this.newBox({
-			width: 200,
-			height: 200,
-			last: this.getLastBox()
+	events() {
+		Observer.on(EVENTS.CLICK, () => {
+			this.newBox({
+				width: 200,
+				height: 200,
+				last: this.getLastBox()
+			});
+		});
+
+		Observer.on(EVENTS.STACK, () => {
+
+		});
+
+		Observer.on(EVENTS.GAME_OVER, () => {
+
 		});
 	}
 

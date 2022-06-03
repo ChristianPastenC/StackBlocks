@@ -1,7 +1,13 @@
 import { App } from './App';
+import Observer, { EVENTS } from './Observer';
 
-const app = new App(document.querySelector('#game-container'));
+const container = document.querySelector('#game-container')
+const app = new App(container);
 
 window.addEventListener('resize', () => {
 	app.onResize();
+});
+
+container.addEventListener('click', () => {
+	Observer.emit(EVENTS.CLICK);
 });
