@@ -3,6 +3,7 @@ import Box from '../objects/Box';
 import BoxCreator from '../objects/BoxCreator';
 import SliceBox from '../objects/SliceBox';
 import Observer, { EVENTS } from '../Observer';
+import * as TWEEN from '@tweenjs/tween.js/dist/tween.umd';
 class Scene1 extends Scene {
 	constructor() {
 		super();
@@ -64,6 +65,26 @@ class Scene1 extends Scene {
 			this.boxesGroup.add(currentBaseCut.getBase());
 			this.add(currentBaseCut.getCut());
 
+			// Fade box tweens
+			const tweenCut = new TWEEN.Tween(currentBaseCut.getCut().position)
+				.to({
+					[newBox.axis]: currentBaseCut.getCut().position[newBox.axis] + (200 * newBox.direction)
+				}, 500)
+				.easing(TWEEN.Easing.Quadratic.Out);
+			tweenCut.start();
+
+			currentBaseCut.getCut().material.transparent = true;
+			const tweenCutAlpha = new TWEEN.Tween(currentBaseCut.getCut().material)
+				.to({
+					opacity: 0,
+				}, 600)
+				.easing(TWEEN.Easing.Quadratic.Out)
+				.onComplete(() => {
+					this.remove(currentBaseCut.getCut());
+				});
+			tweenCutAlpha.start();
+			
+
 			// new box
 			this.newBox({
 				width: newBox.base.width,
@@ -91,6 +112,7 @@ class Scene1 extends Scene {
 	}
 
 	update() {
+		TWEEN.update();
 		this.getLastBox().update();
 	}
 }
