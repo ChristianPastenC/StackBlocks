@@ -27,6 +27,11 @@ class Scene1 extends Scene {
 			last: this.baseCube
 		});
 
+		// Events
+		window.addEventListener('click', () => {
+			this.click();
+		});
+
 		// Helpers
 		this.add(new AxesHelper(800));
 
@@ -38,6 +43,14 @@ class Scene1 extends Scene {
 
 	getLastBox() {
 		return this.boxesGroup.children[this.boxesGroup.children.length - 1];
+	}
+
+	click() {
+		this.newBox({
+			width: 200,
+			height: 200,
+			last: this.getLastBox()
+		});
 	}
 
 	newBox({ width, height, last }) {
