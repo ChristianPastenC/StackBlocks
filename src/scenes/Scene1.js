@@ -56,7 +56,7 @@ class Scene1 extends Scene {
 		});
 
 		Observer.on(EVENTS.GAME_OVER, () => {
-
+			console.log('game over');
 		});
 	}
 
