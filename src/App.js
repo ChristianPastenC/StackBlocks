@@ -1,7 +1,6 @@
 import { WebGLRenderer, sRGBEncoding, OrthographicCamera } from 'three';
 import Observer, { EVENTS } from './Observer';
 import * as TWEEN from '@tweenjs/tween.js/dist/tween.umd';
-// import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import Scene1 from './scenes/Scene1';
 export class App {
 	constructor(container) {
@@ -22,8 +21,6 @@ export class App {
 		);
 		this.camera.position.set(10, 10 + this.camera_y, 10);
 		this.camera.lookAt(0, this.camera_y, 0);
-
-		// this.control = new OrbitControls(this.camera, this.container);
 
 		// ## Renderer's config
 		this.renderer = new WebGLRenderer({
@@ -56,11 +53,34 @@ export class App {
 		});
 
 		Observer.on(EVENTS.START, () => {
+			// Reset camera port
+			this.camera_y = 300;
+			this.camera.position.set(10, 10 + this.camera_y, 10);
+			this.camera.lookAt(0, this.camera_y, 0);
 
+			// return zoom to normal after to game over
+			const camera_zoom_in = new TWEEN.Tween(this.camera)
+				.to({
+					zoom: 1
+				}, 900)
+				.easing(TWEEN.Easing.Sinusoidal.In)
+				.onUpdate(() => {
+					this.camera.updateProjectionMatrix();
+				});
+			camera_zoom_in.start();
 		});
 
 		Observer.on(EVENTS.GAME_OVER, () => {
-			
+			// zooms out on game over
+			const camera_zoom_out = new TWEEN.Tween(this.camera)
+				.to({
+					zoom: 0.6
+				}, 700)
+				.easing(TWEEN.Easing.Quadratic.Out)
+				.onUpdate(() => {
+					this.camera.updateProjectionMatrix();
+				});
+			camera_zoom_out.start();
 		});
 	}
 

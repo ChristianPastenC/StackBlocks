@@ -30,9 +30,6 @@ class Scene1 extends Scene {
 		this.boxes_group = new Group();
 		this.add(this.boxes_group);
 
-		// Helpers
-		this.add(new AxesHelper(800));
-
 		// Luces
 		const ambientLight = new HemisphereLight(0xffffbb, 0x080820, .5);
 		const light = new DirectionalLight(0xffffff, 1.0);
@@ -103,6 +100,12 @@ class Scene1 extends Scene {
 		Observer.on(EVENTS.GAME_OVER, () => {
 			if(!this.game_over){
 				this.stack_points = 0;
+				const tween_gameover = new TWEEN.Tween(this.getLastBox().position)
+				.to({
+					y: this.getLastBox().position.y + 300
+				}, 1000)
+				.easing(TWEEN.Easing.Bounce.Out);
+				tween_gameover.start();
 			}
 			this.game_over = true;
 		})
