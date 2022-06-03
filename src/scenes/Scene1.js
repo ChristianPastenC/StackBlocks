@@ -1,7 +1,7 @@
 import { Scene, Color, DirectionalLight, HemisphereLight, Group, AxesHelper } from 'three';
 import Box from '../objects/Box';
 import BoxCreator from '../objects/BoxCreator';
-import SliceBox from '../objects/SliceBox';
+import SlicesBox from '../objects/SlicesBox';
 import Observer, { EVENTS } from '../Observer';
 import * as TWEEN from '@tweenjs/tween.js/dist/tween.umd';
 class Scene1 extends Scene {
@@ -9,36 +9,37 @@ class Scene1 extends Scene {
 		super();
 		this.background = new Color('skyblue').convertSRGBToLinear();
 
-		this.stackPoints = 0;
-		this.gameOver = true;
+		this.stack_points = 0;
+		this.game_over = true;
 
 		this.create();
 		this.events();
 	}
 
 	create() {
-		this.baseCube = new BoxCreator({
+
+		this.base_cube = new BoxCreator({
 			width: 200,
 			height: 200,
 			alt: 200,
-			color: 0x2c3e50,
+			color: 0x2c3e50
 		});
-		this.add(this.baseCube);
+		this.add(this.base_cube);
 
-		// boxes group
-		this.boxesGroup = new Group();
-		this.add(this.boxesGroup);
+		// grupo de cajas
+		this.boxes_group = new Group();
+		this.add(this.boxes_group);
 
 		this.newBox({
 			width: 200,
 			height: 200,
-			last: this.baseCube
+			last: this.base_cube
 		});
 
 		// Helpers
 		this.add(new AxesHelper(800));
 
-		// Lights
+		// Luces
 		const ambientLight = new HemisphereLight(0xffffbb, 0x080820, .5);
 		const light = new DirectionalLight(0xffffff, 1.0);
 		this.add(light, ambientLight);
@@ -54,61 +55,62 @@ class Scene1 extends Scene {
 			this.getLastBox().place();
 		});
 
-		Observer.on(EVENTS.STACK, (newBox) => {
-			this.stackPoints++;
+		Observer.on(EVENTS.STACK, (new_box) => {
+			this.stack_points++;
 
-			// Remove main box
-			this.boxesGroup.remove(this.getLastBox());
+			// Removemos el bloque principal
+			this.boxes_group.remove(this.getLastBox());
 
-			// Cut current box
-			const currentBaseCut = new SliceBox(newBox);
-			this.boxesGroup.add(currentBaseCut.getBase());
-			this.add(currentBaseCut.getCut());
+			// Espacio para cortar el bloque
+			const actual_base_cut = new SlicesBox(new_box);
+			this.boxes_group.add(actual_base_cut.getBase());
+			this.add(actual_base_cut.getCut());
 
-			// Fade box tweens
-			const tweenCut = new TWEEN.Tween(currentBaseCut.getCut().position)
+			// Efecto del bloque cortado
+			const tween_cut = new TWEEN.Tween(actual_base_cut.getCut().position)
 				.to({
-					[newBox.axis]: currentBaseCut.getCut().position[newBox.axis] + (200 * newBox.direction)
+					[new_box.axis]: actual_base_cut.getCut().position[new_box.axis] + (200 * new_box.direction)
 				}, 500)
 				.easing(TWEEN.Easing.Quadratic.Out);
-			tweenCut.start();
 
-			currentBaseCut.getCut().material.transparent = true;
-			const tweenCutAlpha = new TWEEN.Tween(currentBaseCut.getCut().material)
+			tween_cut.start();
+
+			actual_base_cut.getCut().material.transparent = true;
+			const tween_cut_alpha = new TWEEN.Tween(actual_base_cut.getCut().material)
 				.to({
-					opacity: 0,
+					opacity: 0
 				}, 600)
 				.easing(TWEEN.Easing.Quadratic.Out)
 				.onComplete(() => {
-					this.remove(currentBaseCut.getCut());
+					this.remove(actual_base_cut.getCut());
 				});
-			tweenCutAlpha.start();
-			
+			tween_cut_alpha.start();
 
-			// new box
+			// Bloque nuevo
 			this.newBox({
-				width: newBox.base.width,
-				height: newBox.base.height,
-				last: this.getLastBox(),
+				width: new_box.base.width,
+				height: new_box.base.height,
+				last: this.getLastBox()
 			});
 		});
 
 		Observer.on(EVENTS.GAME_OVER, () => {
-			console.log('game over');
-		});
+			console.log('Game Over');
+		})
+
 	}
 
 	newBox({ width, height, last }) {
-		const currentBox = new Box({
+		const actual_box = new Box({
 			width,
 			height,
 			last
 		});
-		this.boxesGroup.add(currentBox);
+		this.boxes_group.add(actual_box);
 	}
 
 	getLastBox() {
-		return this.boxesGroup.children[this.boxesGroup.children.length - 1];
+		return this.boxes_group.children[this.boxes_group.children.length - 1];
 	}
 
 	update() {

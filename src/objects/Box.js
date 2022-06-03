@@ -1,61 +1,63 @@
-import BoxCreator from "./BoxCreator";
+import BoxCreator from './BoxCreator';
 import generateColor from '../helpers/generateColors';
-import Observer, { EVENTS } from "../Observer";
+import Observer, { EVENTS } from '../Observer';
 
 class Box extends BoxCreator {
-    constructor({ width, height, last }) {
-        super({ width, height, color: generateColor() });
-        this.last = last;
+	constructor({ width, height, last}) {
+		super({width, height, color: generateColor()});
+		this.last = last;
 
-        this.position.y = last.position.y + last.geometry.parameters.height / 2 + this.geometry.parameters.height / 2;
+		this.position.y = last.position.y + last.geometry.parameters.height / 2 + this.geometry.parameters.height / 2;
 
-        this.maxPosition = 360;
-        this.isStopped = false;
-        this.direction = 1;
-        this.speed = 4;
-        this.currentAxis = (Math.random() >= 0.5) ? 'x' : 'z';
-        this.reverseAxis = (this.currentAxis === 'x') ? 'x' : 'z';
+		this.max_position = 360;
+		this.is_stopped = false;
+		this.direction = 1;
+		this.velocity = 4;
+		this.actual_axis = (Math.random() >= 0.5) ? 'x' : 'z';
+		this.contrary_axis = (this.actual_axis === 'x') ? 'z' : 'x';
 
-        this.position[this.currentAxis] -= this.maxPosition * this.direction;
-        this.position[this.reverseAxis] = last.position[this.reverseAxis];
-    }
+		this.position[this.actual_axis] -= this.max_position * this.direction;
+		this.position[this.contrary_axis] = last.position[this.contrary_axis];
+	}
 
-    place() {
-        const plane = (this.currentAxis === 'x') ? 'width' : 'height';
-        const distanceCenter = this.position[this.currentAxis] - this.last.position[this.currentAxis];
-        const overlay = this.last.dimension[plane] - Math.abs(distanceCenter);
+	place() {
+		const plane = (this.actual_axis === 'x') ? 'width' : 'height';
+		const distance_center = this.position[this.actual_axis] - this.last.position[this.actual_axis];
+		const overlay = this.last.dimension[plane] - Math.abs(distance_center);
 
-        if (overlay > 0) {
+		if(overlay > 0) {
 
-            const cut = this.last.dimension[plane] - overlay;
+			const cut = this.last.dimension[plane] - overlay;
+			const new_box = {
+				base: {
+					width: (plane === 'width') ? overlay : this.dimension.width,
+					height: (plane === 'height') ? overlay : this.dimension.height,
+				},
+				cut: {
+					width: (plane === 'width') ? cut : this.dimension.width,
+					height: (plane === 'height') ? cut : this.dimension.height,
+				},
+				color: this.color,
+				axis: this.actual_axis,
+				last_position: this.position,
+				direction: distance_center/Math.abs(distance_center) | 1
+			}
+			Observer.emit(EVENTS.STACK, new_box);
 
-            const newBox = {
-                base: {
-                    width: (plane === 'width') ? overlay : this.dimension.width,
-                    height: (plane === 'height') ? overlay : this.dimension.height,
-                },
-                cut: {
-                    width: (plane === 'width') ? cut : this.dimension.width,
-                    height: (plane === 'height') ? cut : this.dimension.height,
-                },
-                color: this.color,
-                axis: this.currentAxis,
-                last_position: this.position,
-                direction: distanceCenter / Math.abs(distanceCenter) | 1,
-            }
-            Observer.emit(EVENTS.STACK, newBox);
-        } else {
-            Observer.emit(EVENTS.GAME_OVER);
-        }
-    }
 
-    update() {
-        if (!this.isStopped) {
-            this.position[this.currentAxis] += this.direction * this.speed;
-            if (Math.abs(this.position[this.currentAxis]) >= this.maxPosition) {
-                this.direction *= -1;
-            }
-        }
-    }
+		} else {
+			Observer.emit(EVENTS.GAME_OVER);
+		}
+	}
+
+	update() {
+		if(!this.is_stopped) {
+			this.position[this.actual_axis] += this.direction * this.velocity;
+			if(Math.abs(this.position[this.actual_axis]) >= this.max_position) {
+				this.direction *= -1;
+			}
+		}
+	}
 }
+
 export default Box;
