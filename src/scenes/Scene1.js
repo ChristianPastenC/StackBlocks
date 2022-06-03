@@ -1,11 +1,16 @@
 import { Scene, Color, DirectionalLight, HemisphereLight, Group, AxesHelper } from 'three';
 import Box from '../objects/Box';
 import BoxCreator from '../objects/BoxCreator';
+import SliceBox from '../objects/SliceBox';
 import Observer, { EVENTS } from '../Observer';
 class Scene1 extends Scene {
 	constructor() {
 		super();
 		this.background = new Color('skyblue').convertSRGBToLinear();
+
+		this.stackPoints = 0;
+		this.gameOver = true;
+
 		this.create();
 		this.events();
 	}
@@ -38,21 +43,33 @@ class Scene1 extends Scene {
 		this.add(light, ambientLight);
 	}
 
-	getLastBox() {
-		return this.boxesGroup.children[this.boxesGroup.children.length - 1];
-	}
-
 	events() {
 		Observer.on(EVENTS.CLICK, () => {
-			this.newBox({
-				width: 200,
-				height: 200,
-				last: this.getLastBox()
-			});
+			// this.newBox({
+			// 	width: 200,
+			// 	height: 200,
+			// 	last: this.getLastBox()
+			// });
+			this.getLastBox().place();
 		});
 
-		Observer.on(EVENTS.STACK, () => {
+		Observer.on(EVENTS.STACK, (newBox) => {
+			this.stackPoints++;
 
+			// Remove main box
+			this.boxesGroup.remove(this.getLastBox());
+
+			// Cut current box
+			const currentBaseCut = new SliceBox(newBox);
+			this.boxesGroup.add(currentBaseCut.getBase());
+			this.add(currentBaseCut.getCut());
+
+			// new box
+			this.newBox({
+				width: newBox.base.width,
+				height: newBox.base.height,
+				last: this.getLastBox(),
+			});
 		});
 
 		Observer.on(EVENTS.GAME_OVER, () => {
@@ -67,6 +84,10 @@ class Scene1 extends Scene {
 			last
 		});
 		this.boxesGroup.add(currentBox);
+	}
+
+	getLastBox() {
+		return this.boxesGroup.children[this.boxesGroup.children.length - 1];
 	}
 
 	update() {

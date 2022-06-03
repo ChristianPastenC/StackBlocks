@@ -17,6 +17,7 @@ class Box extends BoxCreator {
         this.reverseAxis = (this.currentAxis === 'x') ? 'x' : 'z';
 
         this.position[this.currentAxis] -= this.maxPosition * this.direction;
+        this.position[this.reverseAxis] = last.position[this.reverseAxis];
     }
 
     place() {
@@ -40,7 +41,7 @@ class Box extends BoxCreator {
                 color: this.color,
                 axis: this.currentAxis,
                 last_position: this.position,
-                direction: distanceCenter / Math.abs(distanceCenter),
+                direction: distanceCenter / Math.abs(distanceCenter) | 1,
             }
             Observer.emit(EVENTS.STACK, newBox);
         } else {
