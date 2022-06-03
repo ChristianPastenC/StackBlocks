@@ -51,6 +51,7 @@ class Scene1 extends Scene {
 		});
 
 		Observer.on(EVENTS.START, () => {
+			this.resetGroup();
 			Observer.emit(EVENTS.UPDATE_POINTS, this.stack_points);
 			this.newBox({
 				width: 200,
@@ -100,7 +101,10 @@ class Scene1 extends Scene {
 		});
 
 		Observer.on(EVENTS.GAME_OVER, () => {
-			console.log('Game Over');
+			if(!this.game_over){
+				this.stack_points = 0;
+			}
+			this.game_over = true;
 		})
 
 	}
@@ -112,6 +116,23 @@ class Scene1 extends Scene {
 			last
 		});
 		this.boxes_group.add(actual_box);
+	}
+
+	resetGroup() {
+		this.boxes_group.children.map((box, i) => {
+			const tween_destroy = new TWEEN.Tween(box.scale)
+				.to({
+					x: 0.5,
+					y: 0.5,
+					z: 0.5
+				}, 80 * i)
+				.easing(TWEEN.Easing.Quadratic.Out)
+				.onComplete(() => {
+					this.boxes_group.remove(box);
+				});
+			
+			tween_destroy.start();
+		});
 	}
 
 	getLastBox() {

@@ -54,6 +54,14 @@ export class App {
 				.easing(TWEEN.Easing.Sinusoidal.In);
 			camera_up.start();
 		});
+
+		Observer.on(EVENTS.START, () => {
+
+		});
+
+		Observer.on(EVENTS.GAME_OVER, () => {
+			
+		});
 	}
 
 	onResize() {
