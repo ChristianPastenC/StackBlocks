@@ -1,7 +1,6 @@
 import { WebGLRenderer, sRGBEncoding, OrthographicCamera } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import Scene1 from './scenes/Scene1';
-
 export class App {
 	constructor(container) {
 		this.container = container;
