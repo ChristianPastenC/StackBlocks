@@ -30,12 +30,6 @@ class Scene1 extends Scene {
 		this.boxes_group = new Group();
 		this.add(this.boxes_group);
 
-		this.newBox({
-			width: 200,
-			height: 200,
-			last: this.base_cube
-		});
-
 		// Helpers
 		this.add(new AxesHelper(800));
 
@@ -46,14 +40,25 @@ class Scene1 extends Scene {
 	}
 
 	events() {
+		Observer.emit(EVENTS.NEW_GAME);
+
 		Observer.on(EVENTS.CLICK, () => {
-			// this.newBox({
-			// 	width: 200,
-			// 	height: 200,
-			// 	last: this.getLastBox()
-			// });
-			this.getLastBox().place();
+			if(this.game_over){
+				Observer.emit(EVENTS.START);
+			}else{
+				this.getLastBox().place();
+			}
 		});
+
+		Observer.on(EVENTS.START, () => {
+			Observer.emit(EVENTS.UPDATE_POINTS, this.stack_points);
+			this.newBox({
+				width: 200,
+				height: 200,
+				last: this.base_cube,
+			});
+			this.game_over = false;
+		})
 
 		Observer.on(EVENTS.STACK, (new_box) => {
 			this.stack_points++;
@@ -115,7 +120,9 @@ class Scene1 extends Scene {
 
 	update() {
 		TWEEN.update();
-		this.getLastBox().update();
+		if(!this.game_over){
+			this.getLastBox().update();
+		}
 	}
 }
 
